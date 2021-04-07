@@ -1,11 +1,10 @@
-django-log-request-id
+nhst-log-request-id
 =====================
 
 **Django middleware and log filter to attach a unique ID to every log message generated as part of a request.**
 
 **Author:** This repository forked and updated form here [github](https://github.com/dabapps/django-log-request-id) written by Jamie Matthews, [@j4mie](https://twitter.com/j4mie)
 
-Example
 -------
 
 ```
@@ -15,27 +14,10 @@ DEBUG [33031a43fc244539895fef70c433337e] myproject.apps.myapp.models: Doing some
 DEBUG [33031a43fc244539895fef70c433337e] myproject.apps.myapp.views: Redirecting to form success page
 ```
 
-Why?
-----
-
-So you can grep (or otherwise search) a set of logs for a high-traffic application to isolate all messages associated with a single request.
-
 How?
 ----
 
 **The request ID is stored in a thread local**. Use of thread locals is not generally considered best practice for Django applications, but seems to be the only viable approach in this case. Pull requests with better ideas are welcome.
-
-Any other neat features?
-------------------------
-
-In some cases, components further up the HTTP stack such as load balancers or proxies may generate request IDs. For example, [Heroku's http-request-id feature](https://devcenter.heroku.com/articles/http-request-id) adds a header to the request called `X_REQUEST_ID`. If such a header is present (and configured in your settings, see below), this ID will be used (instead of generating one). You can configure your settings to use a generated ID or return a default request_id when you expect the ID in the request header but it is not available.
-
-The ID also gets added to the `HttpRequest` object that is handed to your views, in case you need to use it in your application.
-
-If you need to pass on the ID to other services in a multi-tier architecture,
-the nhst_log_request_id.session module contains a wrapper for requests.Session which
-will include the ID in outgoing requests, using the same header as configured in
-your settings.
 
 Installation and usage
 ----------------------
@@ -68,7 +50,7 @@ LOGGING = {
     },
     'formatters': {
         'standard': {
-            'format': '%(levelname)-8s [%(asctime)s] [%(request_id)s] %(name)s: %(message)s'
+            'format': '%(levelname)-8s [%(asctime)s] [%(correlationId)s] %(name)s: %(message)s'
         },
     },
     'handlers': {
@@ -89,6 +71,15 @@ LOGGING = {
 }
 ```
 
+And following settings for consistant log messages across other projects
+
+```
+LOG_REQUEST_ID_HEADER = 'HTTP_X_CORRELATION_ID'
+GENERATE_REQUEST_ID_IF_NOT_IN_HEADER = True
+REQUEST_ID_RESPONSE_HEADER = 'X-Correlation-Id'
+REQUEST_ID_PROPERTY_NAME = 'correlationId'
+```
+
 You can then output log messages as usual:
 
 ```python
@@ -97,55 +88,33 @@ logger = logging.getLogger(__name__)
 logger.debug("A wild log message appears!")
 ```
 
-If you wish to use an ID provided in a request header, add the following setting:
+To check `json` object of final log which will be sync with `ELK Stack` in local, add following line in you `local.py` setting
 
-```python
-LOG_REQUEST_ID_HEADER = "HTTP_X_REQUEST_ID"
+```
+LOGGING["handlers"]["console"]['formatter'] = "json"
 ```
 
-Setting this value as above will enable requests having the header `X-Request-Id` to be logged with the header value supplied.
+And in browser, you can see `X-Correlation-Id:` in response header of any request which coming through configured pipeline.
 
-Note that this value must conform to the format for [Django META keys](https://docs.djangoproject.com/en/2.1/ref/request-response/#django.http.HttpRequest.META), otherwise it will be ignored.
+Ougoing request from django app
+-------------------------------
 
-If you wish to fall back to a generated ID when you have the `LOG_REQUEST_ID_HEADER` set but it was not provided in the request, add the following setting:
+To include `correlationId` in ougoing request from configured django app to other app, we can access current `correlationId` from `local` object of `nhst_log_request_id` package. You can modify request header of outgoing request in a centralize place.
 
-```python
-GENERATE_REQUEST_ID_IF_NOT_IN_HEADER = True
+import this in you code:
+
+```
+from nhst_log_request_id import DEFAULT_REQUEST_ID_PROPERTY_NAME, REQUEST_ID_PROPERTY_NAME_SETTING, REQUEST_ID_RESPONSE_HEADER_SETTING, local
 ```
 
-If you wish to include the request id in the response headers, add the following setting, where `RESPONSE_HEADER_NAME` is the name of the custom header you are going to use:
+and modify request before sending request:
 
-```python
-REQUEST_ID_RESPONSE_HEADER = "RESPONSE_HEADER_NAME"
 ```
-
-If you wish to change the default `request_id` in the log output, the the following settings, where `none` (default) is the value you want to be the default value in case it's missing.
-
-```python
-NO_REQUEST_ID = "none"
+if(local):
+    header_property = getattr(settings, REQUEST_ID_RESPONSE_HEADER_SETTING)
+    request_id_property_name = getattr(settings, REQUEST_ID_PROPERTY_NAME_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME)
+    self.headers[header_property] = local.__dict__.get(request_id_property_name,'none')
 ```
-
-Logging all requests
---------------------
-
-The `RequestIDMiddleware` also has the ability to log all requests received by the application, including some useful information such as the user ID (if present). To enable this feature, add `LOG_REQUESTS = True` to your settings. The messages are sent to the `nhst_log_request_id.middleware` logger at `INFO` level.
-
-Logging other user attributes
---------------------
-
-If you would like to log another user attribute instead of user ID, this can be specified with the `LOG_USER_ATTRIBUTE` setting. Eg. to log the username, use: `LOG_USER_ATTRIBUTE = "username"`
-
-Passing on the ID
------------------
-
-```python
-from nhst_log_request_id.session import Session
-session = Session()
-session.get('http://myservice.myapp.com/')
-```
-
-You can customise the header used in the outgoing request with the `OUTGOING_REQUEST_ID_HEADER` setting.
-
 
 License
 -------
@@ -172,7 +141,3 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-## Code of conduct
-
-For guidelines regarding the code of conduct when contributing to this repository please review [https://www.dabapps.com/open-source/code-of-conduct/](https://www.dabapps.com/open-source/code-of-conduct/)
