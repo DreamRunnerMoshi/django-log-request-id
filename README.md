@@ -3,9 +3,7 @@ django-log-request-id
 
 **Django middleware and log filter to attach a unique ID to every log message generated as part of a request.**
 
-**Author:** Jamie Matthews, [@j4mie](https://twitter.com/j4mie)
-
-[![Build Status](https://travis-ci.org/dabapps/django-log-request-id.png?branch=master)](https://travis-ci.org/dabapps/django-log-request-id)
+**Author:** This repository forked and updated form here [github](https://github.com/dabapps/django-log-request-id) written by Jamie Matthews, [@j4mie](https://twitter.com/j4mie)
 
 Example
 -------
@@ -35,25 +33,25 @@ In some cases, components further up the HTTP stack such as load balancers or pr
 The ID also gets added to the `HttpRequest` object that is handed to your views, in case you need to use it in your application.
 
 If you need to pass on the ID to other services in a multi-tier architecture,
-the log_request_id.session module contains a wrapper for requests.Session which
+the nhst_log_request_id.session module contains a wrapper for requests.Session which
 will include the ID in outgoing requests, using the same header as configured in
 your settings.
 
 Installation and usage
 ----------------------
 
-First, install the package: `pip install django-log-request-id`
+First, install the package: `pip install nhst-log-request-id`
 
 Add the middleware to your `MIDDLEWARE_CLASSES` setting. It should be at the very top.
 
 ```python
 MIDDLEWARE_CLASSES = (
-    'log_request_id.middleware.RequestIDMiddleware',
+    'nhst_log_request_id.middleware.RequestIDMiddleware',
     # ... other middleware goes here
 )
 ```
 
-Add the `log_request_id.filters.RequestIDFilter` to your `LOGGING` setting. You'll also need to update your `formatters` to include a format with the new `request_id` variable, add a handler to output the messages (eg to the console), and finally attach the handler to your application's logger.
+Add the `nhst_log_request_id.filters.RequestIDFilter` to your `LOGGING` setting. You'll also need to update your `formatters` to include a format with the new `request_id` variable, add a handler to output the messages (eg to the console), and finally attach the handler to your application's logger.
 
 If none of the above made sense, study [Django's logging documentation](https://docs.djangoproject.com/en/dev/topics/logging/).
 
@@ -65,7 +63,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'filters': {
         'request_id': {
-            '()': 'log_request_id.filters.RequestIDFilter'
+            '()': 'nhst_log_request_id.filters.RequestIDFilter'
         }
     },
     'formatters': {
@@ -130,7 +128,7 @@ NO_REQUEST_ID = "none"
 Logging all requests
 --------------------
 
-The `RequestIDMiddleware` also has the ability to log all requests received by the application, including some useful information such as the user ID (if present). To enable this feature, add `LOG_REQUESTS = True` to your settings. The messages are sent to the `log_request_id.middleware` logger at `INFO` level.
+The `RequestIDMiddleware` also has the ability to log all requests received by the application, including some useful information such as the user ID (if present). To enable this feature, add `LOG_REQUESTS = True` to your settings. The messages are sent to the `nhst_log_request_id.middleware` logger at `INFO` level.
 
 Logging other user attributes
 --------------------
@@ -141,7 +139,7 @@ Passing on the ID
 -----------------
 
 ```python
-from log_request_id.session import Session
+from nhst_log_request_id.session import Session
 session = Session()
 session.get('http://myservice.myapp.com/')
 ```

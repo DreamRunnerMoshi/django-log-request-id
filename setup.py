@@ -11,12 +11,12 @@ import codecs
 
 
 
-name = 'django-log-request-id'
-package = 'log_request_id'
+name = 'nhst-log-request-id'
+package = 'nhst_log_request_id'
 description = 'Django middleware and log filter to attach a unique ID to every log message generated as part of a request'
-url = 'https://github.com/dabapps/django-log-request-id/'
-author = 'DabApps'
-author_email = 'hello@dabapps.com'
+url = 'https://github.com/DreamRunnerMoshi/django-log-request-id/'
+author = 'Moshi'
+author_email = 'moshiur.rahman@nhst.com'
 license = 'BSD'
 install_requires = ["django>=1.8"]
 

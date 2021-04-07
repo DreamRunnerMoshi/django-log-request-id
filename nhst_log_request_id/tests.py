@@ -4,9 +4,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 from requests import Request
 
-from log_request_id import DEFAULT_NO_REQUEST_ID, local
-from log_request_id.session import Session
-from log_request_id.middleware import RequestIDMiddleware
+from nhst_log_request_id import DEFAULT_NO_REQUEST_ID, local
+from nhst_log_request_id.session import Session
+from nhst_log_request_id.middleware import RequestIDMiddleware
 from testproject.views import test_view
 
 

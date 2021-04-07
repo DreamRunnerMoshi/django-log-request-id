@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 import json
 
-from log_request_id import DEFAULT_NO_REQUEST_ID, LOG_REQUESTS_NO_SETTING, REQUEST_ID_PROPERTY_NAME_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME, local
+from nhst_log_request_id import DEFAULT_NO_REQUEST_ID, LOG_REQUESTS_NO_SETTING, REQUEST_ID_PROPERTY_NAME_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME, local
 
 
 class RequestIDFilter(logging.Filter):

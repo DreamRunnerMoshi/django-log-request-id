@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from requests import Session as BaseSession
 
-from log_request_id import REQUEST_ID_RESPONSE_HEADER_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME, OUTGOING_REQUEST_ID_HEADER_SETTING, REQUEST_ID_HEADER_SETTING, REQUEST_ID_PROPERTY_NAME_SETTING, local
+from nhst_log_request_id import REQUEST_ID_RESPONSE_HEADER_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME, OUTGOING_REQUEST_ID_HEADER_SETTING, REQUEST_ID_HEADER_SETTING, REQUEST_ID_PROPERTY_NAME_SETTING, local
 
 
 class Session(BaseSession):
