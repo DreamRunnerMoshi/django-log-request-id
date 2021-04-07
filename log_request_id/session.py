@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from requests import Session as BaseSession
 
-from log_request_id import DEFAULT_NO_REQUEST_ID, OUTGOING_REQUEST_ID_HEADER_SETTING, REQUEST_ID_HEADER_SETTING, local
+from log_request_id import REQUEST_ID_RESPONSE_HEADER_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME, OUTGOING_REQUEST_ID_HEADER_SETTING, REQUEST_ID_HEADER_SETTING, REQUEST_ID_PROPERTY_NAME_SETTING, local
 
 
 class Session(BaseSession):
@@ -22,9 +22,9 @@ class Session(BaseSession):
     def prepare_request(self, request):
         """Include the request ID, if available, in the outgoing request"""
         try:
-            request_id = local.request_id
+            request_id_property_name = getattr(settings, REQUEST_ID_PROPERTY_NAME_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME)
             if self.request_id_header:
-                request.headers[self.request_id_header] = request_id
+                request.headers[self.request_id_header] = local.__dict__.get(request_id_property_name,'none')
         except AttributeError:
             pass
 

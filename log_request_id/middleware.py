@@ -8,7 +8,7 @@ except ImportError:
     MiddlewareMixin = object
 from log_request_id import local, REQUEST_ID_HEADER_SETTING, LOG_REQUESTS_SETTING, DEFAULT_NO_REQUEST_ID, \
     REQUEST_ID_RESPONSE_HEADER_SETTING, GENERATE_REQUEST_ID_IF_NOT_IN_HEADER_SETTING, LOG_REQUESTS_NO_SETTING, \
-    LOG_USER_ATTRIBUTE_SETTING
+    LOG_USER_ATTRIBUTE_SETTING, REQUEST_ID_PROPERTY_NAME_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME
 
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 class RequestIDMiddleware(MiddlewareMixin):
     def process_request(self, request):
         request_id = self._get_request_id(request)
-        local.request_id = request_id
+        request_id_property_name = getattr(settings,REQUEST_ID_PROPERTY_NAME_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME)
+        setattr(local,request_id_property_name,request_id)
         request.id = request_id
 
     def get_log_message(self, request, response):
@@ -47,7 +48,8 @@ class RequestIDMiddleware(MiddlewareMixin):
         logger.info(self.get_log_message(request, response))
 
         try:
-            del local.request_id
+            request_id_property_name = getattr(settings,REQUEST_ID_PROPERTY_NAME_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME)
+            delattr(local,request_id_property_name)
         except AttributeError:
             pass
 
