@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from requests import Session as BaseSession
 
-from nhst_log_request_id import REQUEST_ID_RESPONSE_HEADER_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME, OUTGOING_REQUEST_ID_HEADER_SETTING, REQUEST_ID_HEADER_SETTING, REQUEST_ID_PROPERTY_NAME_SETTING, local
+from nhst_log_request_id import DEFAULT_NO_REQUEST_ID, DEFAULT_REQUEST_ID_PROPERTY_NAME, OUTGOING_REQUEST_ID_HEADER_SETTING, REQUEST_ID_HEADER_SETTING, REQUEST_ID_PROPERTY_NAME_SETTING, local
 
 
 class Session(BaseSession):
@@ -24,7 +24,7 @@ class Session(BaseSession):
         try:
             request_id_property_name = getattr(settings, REQUEST_ID_PROPERTY_NAME_SETTING, DEFAULT_REQUEST_ID_PROPERTY_NAME)
             if self.request_id_header:
-                request.headers[self.request_id_header] = local.__dict__.get(request_id_property_name,'none')
+                request.headers[self.request_id_header] = getattr(local,request_id_property_name,DEFAULT_NO_REQUEST_ID)
         except AttributeError:
             pass
 
