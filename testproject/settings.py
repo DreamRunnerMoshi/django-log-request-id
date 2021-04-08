@@ -13,10 +13,10 @@ SECRET_KEY = 'secret'
 
 ROOT_URLCONF = "testproject.urls"
 
-INSTALLED_APPS = ["log_request_id"]
+INSTALLED_APPS = ["nhst_log_request_id"]
 
 MIDDLEWARE_CLASSES = [
-    'log_request_id.middleware.RequestIDMiddleware',
+    'nhst_log_request_id.middleware.RequestIDMiddleware',
     # ... other middleware goes here
 ] + list(getattr(global_settings, "MIDDLEWARE_CLASSES", []))
 
@@ -27,7 +27,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'filters': {
         'request_id': {
-            '()': 'log_request_id.filters.RequestIDFilter'
+            '()': 'nhst_log_request_id.filters.RequestIDFilter'
         }
     },
     'formatters': {
@@ -49,7 +49,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        'log_request_id.middleware': {
+        'nhst_log_request_id.middleware': {
             'handlers': ['mock'],
             'level': 'DEBUG',
             'propagate': False,
